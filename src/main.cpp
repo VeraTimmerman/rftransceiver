@@ -18,6 +18,7 @@ char hello_world[] = "Hello World!";
 
 // put function declarations here:
 int myFunction(int, int);
+
 void write(char *msg);
 void led();
 void send(uint16_t toAddress, char *msg, uint8_t size);
@@ -30,8 +31,8 @@ void setup() {
   pinMode(USER_LED, OUTPUT);
   led();
 
-  radio.initialize(FREQUENCY, SEND_ID, NETWORKID);
-  radio.encrypt(ENCRYPTKEY);
+//   radio.initialize(FREQUENCY, SEND_ID, NETWORKID);
+//   radio.encrypt(ENCRYPTKEY);
 }
 
 void loop() {
@@ -43,6 +44,7 @@ void loop() {
     led();
     // send(RECEIVE_ID, hello_world, strlen(hello_world));
     // receive();
+
     delay(1000);
   }
 }
@@ -60,11 +62,11 @@ void write(char *msg)
 
 void led()
 {
+  digitalWrite(USER_LED, current_state);
+
   char buffer[32];
   memset (buffer, 0x00, 32);
   snprintf(buffer, 32, "current_state %u", current_state);
-  
-  digitalWrite(USER_LED, current_state);
   write(buffer);
 
   if(current_state == LOW)
@@ -75,7 +77,6 @@ void led()
   {
     current_state = LOW;
   }
-
 }
 
 void send(uint16_t toAddress, char *msg, uint8_t len)
