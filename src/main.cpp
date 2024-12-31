@@ -4,23 +4,24 @@
 // put function declarations here:
 int myFunction(int, int);
 void write();
-void led(int *current_state);
+void led();
+
+int current_state = LOW;
 
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
   Serial.println("Hello world");
   pinMode(USER_LED, OUTPUT);
-  digitalWrite(USER_LED, LOW);
+  led();
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  int current_state = LOW;
   while(true)
   {
     write();
-    led(&current_state);
+    led();
     delay(1000);
   }
 }
@@ -39,22 +40,21 @@ void write()
   Serial.println(buffer);
 }
 
-void led(int *current_state)
+void led()
 {
-  if(*current_state == LOW)
+  digitalWrite(USER_LED, current_state);
+
+  char buffer[32];
+  memset (buffer, 0x00, 32);
+  snprintf(buffer, 32, "current_state %u", current_state);
+  Serial.println(buffer);
+
+  if(current_state == LOW)
   {
-    *current_state = HIGH;
+    current_state = HIGH;
   }
   else
   {
-    *current_state = LOW;
+    current_state = LOW;
   }
-
-  // digitalWrite(USER_LED, current_state);
-  char buffer[32];
-  memset (buffer, 0x00, 32);
-  snprintf(buffer, 32, "current_state %u", *current_state);
-  Serial.println(buffer);
-  digitalWrite(USER_LED, *current_state);
-
 }
