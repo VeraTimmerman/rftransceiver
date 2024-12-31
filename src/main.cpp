@@ -19,7 +19,7 @@ char hello_world[] = "Hello World!";
 // put function declarations here:
 int myFunction(int, int);
 void write(char *msg);
-void led(int *current_state);
+void led();
 void send(uint16_t toAddress, char *msg, uint8_t size);
 void receive();
 
@@ -28,7 +28,7 @@ void setup() {
   Serial.begin(9600);
   write(hello_world);
   pinMode(USER_LED, OUTPUT);
-  digitalWrite(USER_LED, current_state);
+  led();
 
   radio.initialize(FREQUENCY, SEND_ID, NETWORKID);
   radio.encrypt(ENCRYPTKEY);
@@ -40,8 +40,8 @@ void loop() {
   while(true)
   {
     write(hello_world);
-    // led(&current_state);
-    send(RECEIVE_ID, hello_world, strlen(hello_world));
+    led();
+    // send(RECEIVE_ID, hello_world, strlen(hello_world));
     // receive();
     delay(1000);
   }
@@ -58,23 +58,24 @@ void write(char *msg)
   Serial.flush();
 }
 
-void led(int *current_state)
+void led()
 {
-  if(*current_state == LOW)
+  char buffer[32];
+  memset (buffer, 0x00, 32);
+  snprintf(buffer, 32, "current_state %u", current_state);
+  
+  digitalWrite(USER_LED, current_state);
+  write(buffer);
+
+  if(current_state == LOW)
   {
-    *current_state = HIGH;
+    current_state = HIGH;
   }
   else
   {
-    *current_state = LOW;
+    current_state = LOW;
   }
 
-  // digitalWrite(USER_LED, current_state);
-  char buffer[32];
-  memset (buffer, 0x00, 32);
-  snprintf(buffer, 32, "current_state %u", *current_state);
-  write(buffer);
-  digitalWrite(USER_LED, *current_state);
 }
 
 void send(uint16_t toAddress, char *msg, uint8_t len)
@@ -85,13 +86,14 @@ void send(uint16_t toAddress, char *msg, uint8_t len)
   snprintf(buff, 63, "TO: [%u] MSG: [%s] LEN: [%u]", toAddress, msg, len);
   write(buff);
 
-  bool result = radio.sendWithRetry(toAddress, msg, len, 2, 30);
+  bool result = true;//radio.sendWithRetry(toAddress, msg, len, 2, 30);
   if(result)
   {
     write("sent was true");
-    digitalWrite(USER_LED, HIGH);
-    delay(50);
-    digitalWrite(USER_LED, LOW);
+    led();
+    delay(1000);
+    led();
+    delay(1000);
   }
   else
   {
