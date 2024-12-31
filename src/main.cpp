@@ -41,8 +41,8 @@ void loop() {
   while(true)
   {
     write(hello_world);
-    led();
-    // send(RECEIVE_ID, hello_world, strlen(hello_world));
+    // led();
+    send(RECEIVE_ID, hello_world, strlen(hello_world));
     // receive();
 
     delay(1000);
@@ -92,9 +92,8 @@ void send(uint16_t toAddress, char *msg, uint8_t len)
   {
     write("sent was true");
     led();
-    delay(1000);
+    delay(50);
     led();
-    delay(1000);
   }
   else
   {
