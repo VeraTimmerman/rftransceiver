@@ -18,6 +18,7 @@
 RFM69 radio;
 int current_state = LOW;
 char hello_world[] = "Hello World!";
+bool init_successfull = false;
 
 // put function declarations here:
 int myFunction(int, int);
@@ -36,17 +37,21 @@ void setup() {
   pinMode(USER_LED, OUTPUT);
   led();
 
-  bool result = radio.initialize(FREQUENCY, SEND_ID, NETWORKID);
-  if(result)
+  init_successfull = radio.initialize(FREQUENCY, SEND_ID, NETWORKID);
+  if(init_successfull)
   {
     #if DEBUG_LOGLVL > 1
+    char buff[50];
+    memset(buff, 0x00, 50);
+    snprintf(buff, 49, "\nListening at %d Mhz...", FREQUENCY==RF69_433MHZ ? 433 : FREQUENCY==RF69_868MHZ ? 868 : 915);
+    write(buff);
     write("initializing radio successfull");
     #endif
     radio.encrypt(ENCRYPTKEY);
   }
   else
   {
-    write("initializing radio successfull");
+    write("initializing radio un successfull");
   }
 }
 
@@ -55,12 +60,19 @@ void loop() {
   
   while(true)
   {
-    #if DEBUG_LOGLVL > 3
-    write(hello_world);
-    #endif
-    // led();
-    send(RECEIVE_ID, hello_world, strlen(hello_world));
+
+    if(init_successfull)
+    {
+      send(RECEIVE_ID, hello_world, strlen(hello_world));
+    }
+    else
+    {
+      #if DEBUG_LOGLVL > 3
+      write("initialization not successfull!");
+      #endif
+      led();
     // receive();
+    }
 
     delay(1000);
   }
@@ -108,14 +120,14 @@ void send(uint16_t toAddress, char *msg, uint8_t len)
   write(buff);
   #endif
 
-  bool result = true;//radio.sendWithRetry(toAddress, msg, len, 2, 30);
+  bool result = radio.sendWithRetry(toAddress, "All About Circuits", 18);
   if(result)
   {
     #if DEBUG_LOGLVL > 3
     write("sent was true");
     #endif
     led();
-    delay(50);
+    delay(100);
     led();
   }
   else
