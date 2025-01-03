@@ -21,8 +21,6 @@ char hello_world[] = "Hello World!";
 bool init_successfull = false;
 
 // put function declarations here:
-int myFunction(int, int);
-
 void write(char *msg);
 void led();
 void send(uint16_t toAddress, char *msg, uint8_t size);
@@ -76,11 +74,6 @@ void loop() {
 
     delay(1000);
   }
-}
-
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
 }
 
 void write(char *msg)
