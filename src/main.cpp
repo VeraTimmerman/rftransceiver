@@ -13,7 +13,7 @@
 #define ENCRYPTKEY "sampleEncryptKey"
 #define RECEIVE_ID  1
 
-#define DEBUG_LOGLVL    2
+#define DEBUG_LOGLVL    5
 
 RFM69 radio;
 int current_state = LOW;
