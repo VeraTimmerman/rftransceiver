@@ -13,7 +13,7 @@
 #define ENCRYPTKEY "sampleEncryptKey"
 #define RECEIVE_ID  1
 
-#define DEBUG_LOGLVL    5
+#define DEBUG_LOGLVL    3
 
 RFM69 radio;
 int current_state = LOW;
@@ -113,7 +113,8 @@ void send(uint16_t toAddress, char *msg, uint8_t len)
   write(buff);
   #endif
 
-  bool result = radio.sendWithRetry(toAddress, "All About Circuits", 18);
+  bool result = 
+  radio.send(toAddress, "All About Circuits", 18, false); // radio.sendWithRetry(toAddress, "All About Circuits", 18);
   if(result)
   {
     #if DEBUG_LOGLVL > 3
