@@ -4,7 +4,8 @@
 #include <RFM69_ATC.h>
 #include <RFM69_OTA.h>
 
-#define USER_LED    13
+//This part defines the LED pin and button pin
+#define USER_LED        9 //LED on D9
 
 #define FREQUENCY RF69_868MHZ
 #define SEND_ID  2
