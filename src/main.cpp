@@ -13,7 +13,7 @@
 #define ENCRYPTKEY "sampleEncryptKey"
 #define RECEIVE_ID  1
 
-#define DEBUG_LOGLVL    3
+#define DEBUG_LOGLVL    5
 
 RFM69 radio;
 int current_state = LOW;
@@ -61,7 +61,14 @@ void loop() {
 
     if(init_successfull)
     {
-      send(RECEIVE_ID, hello_world, strlen(hello_world));
+      if(radio.receiveDone())
+      {
+        receive();
+      }
+      else
+      {
+        send(RECEIVE_ID, hello_world, strlen(hello_world));
+      }
     }
     else
     {
@@ -69,7 +76,6 @@ void loop() {
       write("initialization not successfull!");
       #endif
       led();
-    // receive();
     }
 
     delay(1000);
@@ -105,12 +111,13 @@ void led()
 
 void send(uint16_t toAddress, char *msg, uint8_t len)
 {
-  #if DEBUG_LOGLVL > 3
-  write("send with retry");
+  #if DEBUG_LOGLVL > 5
   char buff[64];
   memset(buff, 0x00, 64);
   snprintf(buff, 63, "TO: [%u] MSG: [%s] LEN: [%u]", toAddress, msg, len);
   write(buff);
+  #elif DEBUG_LOGLVL > 3
+  write("send with retry");
   #endif
 
   bool result = 
@@ -134,23 +141,35 @@ void send(uint16_t toAddress, char *msg, uint8_t len)
 
 void receive()
 {
-  bool result = radio.receiveDone();
-  if(result)
+  // bool result = radio.receiveDone();
+  // if(result)
+  // {
+  //   if(radio.ACKRequested())
+  //   {
+  //     radio.sendACK();
+  //     #if DEBUG_LOGLVL > 2
+  //     write("ACK sent");
+  //     #endif
+  //   }
+
+  //   char buffer[32];
+  //   memset (buffer, 0x00, 32);
+  //   snprintf(buffer, 31, "SENDERID: [%u] DATA: [%s] LEN[%u]", radio.SENDERID, (char *) radio.DATA, radio.DATALEN);    
+  //   write(buffer);
+
+  //   memset (buffer, 0x00, 32);
+  //   snprintf(buffer, 31, "RX_RSSI: [%i]", radio.RSSI);  
+  // }
+
+  //print message received to serial
+  Serial.print('[');Serial.print(radio.SENDERID);Serial.print("] ");
+  Serial.print((char*)radio.DATA);
+  Serial.print("   [RX_RSSI:");Serial.print(radio.RSSI);Serial.print("]");
+  Serial.println();
+
+  if (radio.ACKRequested())
   {
-    if(radio.ACKRequested())
-    {
-      radio.sendACK();
-      #if DEBUG_LOGLVL > 2
-      write("ACK sent");
-      #endif
-    }
-
-    char buffer[32];
-    memset (buffer, 0x00, 32);
-    snprintf(buffer, 31, "SENDERID: [%u] DATA: [%s] LEN[%u]", radio.SENDERID, (char *) radio.DATA, radio.DATALEN);    
-    write(buffer);
-
-    memset (buffer, 0x00, 32);
-    snprintf(buffer, 31, "RX_RSSI: [%i]", radio.RSSI);  
+    radio.sendACK();
+    Serial.print(" - ACK sent");
   }
 }
