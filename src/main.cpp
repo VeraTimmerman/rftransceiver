@@ -1,60 +1,32 @@
 #include <Arduino.h>
-#define USER_LED    13
+#include "led.h"
+#include "rf_comm.h"
+#include "debug.h"
 
-// put function declarations here:
-int myFunction(int, int);
-void write();
-void led();
 
-int current_state = LOW;
+#define DEBUG_LOGLVL    5
+
+#define CURRENT_ID      RECEIVE_ID
+char hello_world[] = "Hello World!";
 
 void setup() {
+  debug_config(9600);
   // put your setup code here, to run once:
-  Serial.begin(9600);
-  Serial.println("Hello world");
-  pinMode(USER_LED, OUTPUT);
-  led();
+  #if DEBUG_LOGLVL > 3
+  debug_write(hello_world);
+  #endif  
+
+  rf_comm_config(CURRENT_ID);
+  led_config();
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
+
   while(true)
   {
-    write();
-    led();
-    delay(1000);
+    led_main();
+    rf_comm_main(CURRENT_ID);
   }
 }
 
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
-}
-
-void write()
-{
-  int result = myFunction(2, 3);
-  char buffer[32];
-  memset (buffer, 0x00, 32);
-  snprintf(buffer, 32, "Hello World %u", result);
-  Serial.println(buffer);
-}
-
-void led()
-{
-  digitalWrite(USER_LED, current_state);
-
-  char buffer[32];
-  memset (buffer, 0x00, 32);
-  snprintf(buffer, 32, "current_state %u", current_state);
-  Serial.println(buffer);
-
-  if(current_state == LOW)
-  {
-    current_state = HIGH;
-  }
-  else
-  {
-    current_state = LOW;
-  }
-}
